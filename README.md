@@ -1,4 +1,4 @@
-# iniq
+# iniq [![Build Status](https://travis-ci.org/jcrd/iniq.svg?branch=master)](https://travis-ci.org/jcrd/iniq)
 
 **iniq** is a simple INI file reader for the command line.
 It queries an INI file based on the path <_section_>.<_key_> and allows use of
