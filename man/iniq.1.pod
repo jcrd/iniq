@@ -1,0 +1,136 @@
+=head1 NAME
+
+iniq - INI file reader
+
+=head1 SYNOPSIS
+
+B<iniq> [options] [FILE]
+
+With no FILE, read standard input.
+
+=head1 DESCRIPTION
+
+iniq is a simple INI file reader for the command line.
+It queries an INI file based on the path <I<section>>.<I<key>> and allows use of
+custom separators in the file and formatting of the output.
+Sections inherit keys from a special DEFAULT section unless the I<-d> flag is
+used.
+See below for examples.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-h>
+
+Show help message.
+
+=item B<-q>
+
+Suppress error messages.
+
+=item B<-d>
+
+Exclude DEFAULT section from output.
+
+=item B<-s> I<SEPARATORS>
+
+Key/value pair separators. Default is '=:'.
+
+=item B<-p> I<PATH>
+
+Path specifying section/key to print. Its format is 'I<section>.I<key>'.
+If no key is provided, all key/value pairs in section are printed.
+If section is followed by a . but no key, key names in section are printed.
+A path without a section will print pairs not in any section.
+The special path '..' will print key names not in any section.
+
+=item B<-f> I<FORMAT>
+
+Print output according to I<FORMAT>, where %s, %k, and %v are replaced by the
+section, key, and value respectively.
+
+=item B<-v>
+
+Show version.
+
+=back
+
+=head1 EXAMPLE
+
+=over
+
+=item Given the configuration file F<example.conf>:
+
+ in_section=false
+ [DEFAULT]
+ default=true
+ [section1]
+ key1=value1
+
+=item Print sections in a file:
+
+B<iniq> F<example.conf>
+ DEFAULT
+ section1
+
+=item Exclude DEFAULT section:
+
+B<iniq> -d F<example.conf>
+ section1
+
+=item Print sectionless key/value pairs:
+
+B<iniq> -p . F<example.conf>
+ in_section=false
+
+=item Print sectionless keys:
+
+B<iniq> -p .. F<example.conf>
+ in_section
+
+=item Print value of sectionless key:
+
+B<iniq> -p .in_section F<example.conf>
+ false
+
+=item Print key/value pairs in section1, excluding DEFAULT:
+
+B<iniq> -d -p section1 F<example.conf>
+ key1=value1
+
+=item Print keys in section1, excluding DEFAULT:
+
+B<iniq> -d -p section1. F<example.conf>
+ key1
+
+=item Print value of key1 in section1:
+
+B<iniq> -p section1.key1 F<example.conf>
+ value1
+
+=item Print values followed by their keys in section1, using the format I<%v:%k>:
+
+B<iniq> -p section1 -f %v:%k F<example.conf>
+ true:default
+ value1:key1
+
+=item Print only the values in section1, using the format I<%v>:
+
+B<iniq> -p section1 -f %v F<example.conf>
+ true
+ value1
+
+=back
+
+=head1 AUTHOR
+
+James Reed E<lt>jcrd@tuta.ioE<gt>
+
+=head1 REPORTING BUGS
+
+Bugs and issues can be reported here: L<https://github.com/jcrd/iniq/issues>
+
+=head1 COPYRIGHT
+
+Copyright 2018 James Reed. iniq is licensed under the New BSD License.

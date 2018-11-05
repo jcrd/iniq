@@ -1,0 +1,7 @@
+[submodule "inih"]
+	path = inih
+	url = https://github.com/jcrd/inih.git
+	branch = iniq
+[submodule "test/sharness"]
+	path = test/sharness
+	url = https://github.com/chriscool/sharness.git
