@@ -20,6 +20,7 @@ $(MANPAGE): $(MANPAGE).pod
 install:
 	mkdir -p $(DESTDIR)$(BINPREFIX)
 	cp -p iniq $(DESTDIR)$(BINPREFIX)
+	mkdir -p $(DESTDIR)$(MANPREFIX)/man1
 	cp -p $(MANPAGE) $(DESTDIR)$(MANPREFIX)/man1
 
 uninstall:
