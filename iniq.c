@@ -286,7 +286,7 @@ print_usage(int code)
           "  -p PATH     Path specifying sections/keys to print\n"
           "  -f FORMAT   Print output according to FORMAT\n"
           "                where %s = section, %k = key, %v = value\n"
-          "  -v          Show version",
+          "  -v          Show version\n",
           code ? stderr : stdout);
 
     exit(code);
