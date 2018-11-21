@@ -8,13 +8,13 @@ CPPFLAGS += -D_DEFAULT_SOURCE -DVERSION=\"$(VERSION)\"
 CFLAGS += -std=c99 -pedantic -Wall -Wextra
 
 OBJ = iniq.o inih/ini.o
-MANPAGE = man/iniq.1
+MANPAGE = iniq.1
 
 all: iniq $(MANPAGE)
 
 iniq: $(OBJ)
 
-$(MANPAGE): $(MANPAGE).pod
+$(MANPAGE): man/$(MANPAGE).pod
 	pod2man -n=iniq -c=iniq -s=1 -r=$(VERSION) $< $(MANPAGE)
 
 install:
