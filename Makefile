@@ -1,4 +1,4 @@
-VERSION := $(shell git describe --dirty --tags --always)
+VERSION := $(shell git describe --dirty --tags --always || cat VERSION)
 
 PREFIX ?= /usr/local
 BINPREFIX ?= $(PREFIX)/bin
