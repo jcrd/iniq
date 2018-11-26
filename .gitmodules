@@ -1,3 +1,0 @@
-[submodule "test/sharness"]
-	path = test/sharness
-	url = https://github.com/chriscool/sharness.git
