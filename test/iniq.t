@@ -4,65 +4,62 @@ test_description='Test iniq'
 
 . ./sharness/sharness.sh
 
-# leave sharness directory
-cd ..
-
-SHARNESS_TEST_DIRECTORY="$(pwd)"
+CONF="$SHARNESS_TEST_DIRECTORY"/test.conf
 
 test_expect_success 'List sections in file' '
-test "$(iniq test.conf)" = "DEFAULT
+test "$(iniq $CONF)" = "DEFAULT
 section1
 multi"
 '
 
 test_expect_success 'List sections from stdin' '
-test "$(cat test.conf | iniq)" = "DEFAULT
+test "$(cat $CONF | iniq)" = "DEFAULT
 section1
 multi"
 '
 
 test_expect_success 'Get keys from section' '
-test "$(iniq -p section1.keyA test.conf)" = "a" &&
-test "$(iniq -p section1.keyB test.conf)" = "b"
+test "$(iniq -p section1.keyA $CONF)" = "a" &&
+test "$(iniq -p section1.keyB $CONF)" = "b"
 '
 
 test_expect_success 'Get keys inherited from DEFAULT' '
-test "$(iniq -p section1.default test.conf)" = "true"
+test "$(iniq -p section1.default $CONF)" = "true"
 '
 
 test_expect_success 'Exclude DEFAULT' '
-test "$(iniq -d test.conf)" = "section1
+test "$(iniq -d $CONF)" = "section1
 multi" &&
-test "$(iniq -d -p section1. test.conf)" = "keyA
+test "$(iniq -d -p section1. $CONF)" = "keyA
 keyB"
 '
 
 test_expect_success 'Get section with multiple declarations' '
-test "$(iniq -d -p multi. test.conf)" = "key1
+test "$(iniq -d -p multi. $CONF)" = "key1
 key2"
 '
 
 test_expect_success 'Get keys not in any section' '
-test "$(iniq -p .. test.conf)" = "no_section" &&
-test "$(iniq -p .no_section test.conf)" = "true"
+test "$(iniq -p .. $CONF)" = "no_section" &&
+test "$(iniq -p .no_section $CONF)" = "true"
 '
 
 test_expect_success 'Format section output' '
-test "$(iniq -d -f ^%s$ test.conf)" = "^section1$
+test "$(iniq -d -f ^%s$ $CONF)" = "^section1$
 ^multi$"
 '
 
 test_expect_success 'Format key/value output' '
-test "$(iniq -d -f ^%k$ -p section1 test.conf)" = "^keyA$
+test "$(iniq -d -f ^%k$ -p section1 $CONF)" = "^keyA$
 ^keyB$" &&
-test "$(iniq -d -f ^%v$ -p section1 test.conf)" = "^a$
+test "$(iniq -d -f ^%v$ -p section1 $CONF)" = "^a$
 ^b$" &&
-test "$(iniq -d -f %v:%k -p section1 test.conf)" = "a:keyA
+test "$(iniq -d -f %v:%k -p section1 $CONF)" = "a:keyA
 b:keyB"
 '
 
 test_expect_success 'Get keys with custom separators' '
-test "$(iniq -s "!$" -f %v -p custom-separators test.conf)" = "1
+test "$(iniq -s "!$" -f %v -p custom-separators $CONF)" = "1
 2"
 '
 
