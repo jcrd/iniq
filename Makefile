@@ -1,4 +1,5 @@
-VERSION := $(shell git describe --dirty --tags --always || cat VERSION)
+VERSIONCMD = git describe --dirty --tags --always 2> /dev/null
+VERSION := $(shell $(VERSIONCMD) || cat VERSION)
 
 PREFIX ?= /usr/local
 BINPREFIX ?= $(PREFIX)/bin
