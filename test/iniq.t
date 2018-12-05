@@ -9,13 +9,15 @@ CONF="$SHARNESS_TEST_DIRECTORY"/test.conf
 test_expect_success 'List sections in file' '
 test "$(iniq $CONF)" = "DEFAULT
 section1
-multi"
+multi
+indented"
 '
 
 test_expect_success 'List sections from stdin' '
 test "$(cat $CONF | iniq)" = "DEFAULT
 section1
-multi"
+multi
+indented"
 '
 
 test_expect_success 'Get keys from section' '
@@ -29,7 +31,8 @@ test "$(iniq -p section1.default $CONF)" = "true"
 
 test_expect_success 'Exclude DEFAULT' '
 test "$(iniq -d $CONF)" = "section1
-multi" &&
+multi
+indented" &&
 test "$(iniq -d -p section1. $CONF)" = "keyA
 keyB"
 '
@@ -46,7 +49,8 @@ test "$(iniq -p .no_section $CONF)" = "true"
 
 test_expect_success 'Format section output' '
 test "$(iniq -d -f ^%s$ $CONF)" = "^section1$
-^multi$"
+^multi$
+^indented$"
 '
 
 test_expect_success 'Format key/value output' '
@@ -61,6 +65,12 @@ b:keyB"
 test_expect_success 'Get keys with custom separators' '
 test "$(iniq -s "!$" -f %v -p custom-separators $CONF)" = "1
 2"
+'
+
+# inih must be built with INI_ALLOW_MULTILINE=0
+test_expect_success 'Get indented lines' '
+test "$(iniq -d -p indented $CONF)" = "line1=1
+line2=2"
 '
 
 test_done
