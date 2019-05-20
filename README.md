@@ -19,6 +19,7 @@ options:
   -q          Suppress error messages
   -d          Exclude DEFAULT section from output
   -s SEPS     Key/value pair separators (default: '=:')
+  -m          Parse multi-line entries
   -p PATH     Path specifying sections/keys to print
   -f FORMAT   Print output according to FORMAT
                 where %s = section, %k = key, %v = value

@@ -283,6 +283,7 @@ print_usage(int code)
           "  -q          Suppress error messages\n"
           "  -d          Exclude DEFAULT section from output\n"
           "  -s SEPS     Key/value pair separators (default: '=:')\n"
+          "  -m          Parse multi-line entries\n"
           "  -p PATH     Path specifying sections/keys to print\n"
           "  -f FORMAT   Print output according to FORMAT\n"
           "                where %s = section, %k = key, %v = value\n"
@@ -295,12 +296,15 @@ print_usage(int code)
 int
 main(int argc, char *argv[])
 {
-    const char *seps = NULL;
+    ini_parser_config c = {
+        .seps = NULL,
+        .multi = 0,
+    };
     const char *path = NULL;
     const char *fmt = NULL;
     int opt;
 
-    while ((opt = getopt(argc, argv, "hqds:p:f:v")) != -1) {
+    while ((opt = getopt(argc, argv, "hqds:mp:f:v")) != -1) {
         switch (opt) {
         case 'h':
             print_usage(EXIT_SUCCESS);
@@ -312,7 +316,10 @@ main(int argc, char *argv[])
             exclude_default = 1;
             break;
         case 's':
-            seps = optarg;
+            c.seps = optarg;
+            break;
+        case 'm':
+            c.multi = 1;
             break;
         case 'p':
             path = optarg;
@@ -329,10 +336,10 @@ main(int argc, char *argv[])
     atexit(cleanup);
 
     if (optind < argc) {
-        if (ini_parse(argv[optind], handler, seps, NULL) < 0)
+        if (ini_parse(argv[optind], handler, c, NULL) < 0)
             die("failed to parse %s\n", argv[optind]);
     } else if (!feof(stdin)) {
-        if (ini_parse_file(stdin, handler, seps, NULL) < 0)
+        if (ini_parse_file(stdin, handler, c, NULL) < 0)
             die("failed to parse stdin\n");
     } else {
         print_usage(2);

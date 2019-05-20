@@ -37,6 +37,11 @@ Exclude DEFAULT section from output.
 
 Key/value pair separators. Default is '=:'.
 
+=item B<-m>
+
+Parse multi-line entries. An entry spans multiple lines if subsequent lines are
+indented deeper than the first line.
+
 =item B<-p> I<PATH>
 
 Path specifying section/key to print. Its format is 'I<section>.I<key>'.

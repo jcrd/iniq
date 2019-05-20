@@ -67,10 +67,14 @@ test "$(iniq -s "!$" -f %v -p custom-separators $CONF)" = "1
 2"
 '
 
-# inih must be built with INI_ALLOW_MULTILINE=0
 test_expect_success 'Get indented lines' '
 test "$(iniq -d -p indented $CONF)" = "line1=1
 line2=2"
+'
+
+test_expect_success 'Get multi-line entry' '
+test "$(iniq -d -p indented -m $CONF)" = "line1=1
+line1=line2=2"
 '
 
 test_done

@@ -6,7 +6,6 @@ BINPREFIX ?= $(PREFIX)/bin
 MANPREFIX ?= $(PREFIX)/share/man
 
 CPPFLAGS += -D_DEFAULT_SOURCE -DVERSION=\"$(VERSION)\"
-CPPFLAGS += -DINI_ALLOW_MULTILINE=0
 CFLAGS += -std=c99 -pedantic -Wall -Wextra
 
 OBJ = iniq.o inih/ini.o
