@@ -1,0 +1,9 @@
+FROM debian:stable-slim
+
+RUN apt-get update
+RUN apt-get install -y make wget
+
+RUN wget https://github.com/jcrd/iniq/releases/download/v0.2.0/iniq-v0.2.0.tar.gz \
+        -O iniq.tar.gz
+RUN tar -xzf iniq.tar.gz
+RUN cp iniq /usr/bin/iniq
