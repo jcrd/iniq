@@ -17,6 +17,11 @@ extern "C" {
 
 #include <stdio.h>
 
+typedef struct {
+    const char *seps;
+    int multi;
+} ini_parser_config;
+
 /* Nonzero if ini_handler callback should accept lineno parameter. */
 #ifndef INI_HANDLER_LINENO
 #define INI_HANDLER_LINENO 0
@@ -48,24 +53,24 @@ typedef char* (*ini_reader)(char* str, int num, void* stream);
    stop on first error), -1 on file open error, or -2 on memory allocation
    error (only when INI_USE_STACK is zero).
 */
-int ini_parse(const char* filename, ini_handler handler, const char* seps,
+int ini_parse(const char* filename, ini_handler handler, ini_parser_config c,
               void* user);
 
 /* Same as ini_parse(), but takes a FILE* instead of filename. This doesn't
    close the file when it's finished -- the caller must do that. */
-int ini_parse_file(FILE* file, ini_handler handler, const char* seps,
+int ini_parse_file(FILE* file, ini_handler handler, ini_parser_config c,
                    void* user);
 
 /* Same as ini_parse(), but takes an ini_reader function pointer instead of
    filename. Used for implementing custom or string-based I/O (see also
    ini_parse_string). */
 int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
-                     const char* seps, void* user);
+                     ini_parser_config c, void* user);
 
 /* Same as ini_parse(), but takes a zero-terminated string with the INI data
 instead of a file. Useful for parsing INI data from a network socket or
 already in memory. */
-int ini_parse_string(const char* string, ini_handler handler, const char* seps,
+int ini_parse_string(const char* string, ini_handler handler, ini_parser_config c,
                      void* user);
 
 /* Nonzero to allow multi-line value parsing, in the style of Python's
