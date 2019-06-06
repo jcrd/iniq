@@ -306,30 +306,14 @@ main(int argc, char *argv[])
 
     while ((opt = getopt(argc, argv, "hqds:mp:f:v")) != -1) {
         switch (opt) {
-        case 'h':
-            print_usage(EXIT_SUCCESS);
-            break;
-        case 'q':
-            quiet = 1;
-            break;
-        case 'd':
-            exclude_default = 1;
-            break;
-        case 's':
-            c.seps = optarg;
-            break;
-        case 'm':
-            c.multi = 1;
-            break;
-        case 'p':
-            path = optarg;
-            break;
-        case 'f':
-            fmt = optarg;
-            break;
-        case 'v':
-            printf("%s\n", VERSION);
-            exit(EXIT_SUCCESS);
+        case 'h': print_usage(EXIT_SUCCESS); break;
+        case 'q': quiet = 1; break;
+        case 'd': exclude_default = 1; break;
+        case 's': c.seps = optarg; break;
+        case 'm': c.multi = 1; break;
+        case 'p': path = optarg; break;
+        case 'f': fmt = optarg; break;
+        case 'v': printf("%s\n", VERSION); exit(EXIT_SUCCESS);
         }
     }
 
