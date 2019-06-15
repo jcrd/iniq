@@ -100,6 +100,11 @@ true
 value1
 ```
 
+## Used by
+
+* [hdparmify](https://github.com/jcrd/hdparmify)
+* [auto-inhibit](https://github.com/jcrd/auto-inhibit)
+
 ## License
 
 This project is licensed under the New BSD License (see [LICENSE](LICENSE)).
