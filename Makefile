@@ -18,11 +18,11 @@ iniq: $(OBJ)
 $(MANPAGE): man/$(MANPAGE).pod
 	pod2man -n=iniq -c=iniq -s=1 -r=$(VERSION) $< $(MANPAGE)
 
-install-iniq:
+install-iniq: iniq
 	mkdir -p $(DESTDIR)$(BINPREFIX)
 	cp -p iniq $(DESTDIR)$(BINPREFIX)
 
-install: install-iniq
+install: install-iniq $(MANPAGE)
 	mkdir -p $(DESTDIR)$(MANPREFIX)/man1
 	cp -p $(MANPAGE) $(DESTDIR)$(MANPREFIX)/man1
 
