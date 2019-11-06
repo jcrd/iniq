@@ -276,6 +276,48 @@ test_expect_success 'pretend we have a pass, fail, and known breakage using --ve
 	test_cmp expect.sorted actual.sorted
 "
 
+# Unfortunately it looks like set -x doesn't behave exactly the same
+# way everywhere. Sometimes in its output it adds blanklines or "+ "
+# before the commands that are run, and sometimes it doesn't add
+# blanklines and adds only "+" before commands. So we need to clean up
+# the output to be able to compare properly.
+
+test_expect_success 'pretend we have a pass, fail, and known breakage using -x' "
+	test_must_fail run_sub_test_lib_test \
+		mixed-results4 'mixed results #4' '' -x <<-\\EOF &&
+	test_expect_success 'passing test' 'true'
+	test_expect_success 'failing test' 'false'
+	test_expect_failure 'pretend we have a known breakage' 'false'
+	test_done
+	EOF
+	(
+		cd mixed-results4 &&
+		sed -e 's/^> //' >expect_out <<-\\EOF &&
+		> expecting success: true
+		> ok 1 - passing test
+		> expecting success: false
+		> not ok 2 - failing test
+		> #	false
+		> checking known breakage: false
+		> not ok 3 - pretend we have a known breakage # TODO known breakage
+		> # still have 1 known breakage(s)
+		> # failed 1 among remaining 2 test(s)
+		> 1..3
+		EOF
+		sed -e '/^ *$/d' >clean_out <out &&
+		test_cmp expect_out clean_out &&
+		sed -e 's/^> //' >expect_err <<-\\EOF &&
+		> +true
+		> +false
+		> error: last command exited with \$?=1
+		> +false
+		> error: last command exited with \$?=1
+		EOF
+		sed -e 's/^+ /+/' >clean_err <err &&
+		test_cmp expect_err clean_err
+	)
+"
+
 test_expect_success 'pretend we have some unstable tests' "
 	run_sub_test_lib_test \
 		results3 'results #3' <<-\\EOF &&
@@ -400,6 +442,7 @@ test_expect_success 'We detect broken && chains' "
 test_expect_success 'tests can be run from an alternate directory' '
 	# Act as if we have an installation of sharness in current dir:
 	ln -sf $SHARNESS_TEST_SRCDIR/sharness.sh . &&
+	ln -sf $SHARNESS_TEST_SRCDIR/lib-sharness . &&
 	export working_path="$(pwd)" &&
 	cat >test.t <<-EOF &&
 	test_description="test run of script from alternate dir"
@@ -414,7 +457,7 @@ test_expect_success 'tests can be run from an alternate directory' '
 	EOF
         (
           # unset SHARNESS variables before sub-test
-	  unset SHARNESS_TEST_DIRECTORY SHARNESS_TEST_SRCDIR &&
+	  unset SHARNESS_TEST_DIRECTORY SHARNESS_TEST_OUTDIR SHARNESS_TEST_SRCDIR &&
 	  # unset HARNESS_ACTIVE so we get a test-results dir
 	  unset HARNESS_ACTIVE &&
 	  chmod +x test.t &&
@@ -498,6 +541,7 @@ test_expect_success 'loading sharness extensions works' '
 		}
 		EOF
 		ln -sf $SHARNESS_TEST_SRCDIR/sharness.sh . &&
+		ln -sf $SHARNESS_TEST_SRCDIR/lib-sharness . &&
 		cat >test-extension.t <<-\EOF &&
 		test_description="test sharness extensions"
 		. ./sharness.sh
@@ -527,6 +571,7 @@ test_expect_success 'empty sharness.d directory does not cause failure' '
 		cd nil-extensions &&
 		mkdir sharness.d  &&
 		ln -sf $SHARNESS_TEST_SRCDIR/sharness.sh . &&
+		ln -sf $SHARNESS_TEST_SRCDIR/lib-sharness . &&
 		cat >test.t <<-\EOF &&
 		test_description="sharness works"
 		. ./sharness.sh
