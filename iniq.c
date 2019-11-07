@@ -337,19 +337,35 @@ main(int argc, char *argv[])
 
     if (path) {
         char *p = path_dup = strdup(path);
+        size_t len = 0;
+        char buf[BUFSIZ];
+        char *s;
 
-        if ((section = strsep(&p, ".")) && streq(section, "")) {
-            // path doesn't specify section
-            section = NO_SECTION;
-            // only real sections inherit DEFAULT section
-            exclude_default = 1;
+        while ((s = strsep(&p, "."))) {
+            if (streq(s, "") && len == 0) {
+                // path doesn't specify section
+                section = NO_SECTION;
+                // only real sections inherit DEFAULT section
+                exclude_default = 1;
 
-            /* anticipate a blank key. if the next char is not ., the path is
-               either . (keys is reverted to 0 below) or specifies a key (keys
-               is ignored). if path is .., keys will be set to 1 below */
-            if (*p != '.')
-                keys = 1;
+                /* anticipate a blank key. if the next char is not ., the path is
+                   either . (keys is reverted to 0 below) or specifies a key (keys
+                   is ignored). if path is .., keys will be set to 1 below */
+                if (*p != '.')
+                    keys = 1;
+            } else {
+                len += snprintf(buf + len, BUFSIZ - len, s);
+                if (buf[len - 1] == '\\') {
+                    buf[len - 1] = '.';
+                    if (len < BUFSIZ)
+                        continue;
+                }
+            }
+            break;
         }
+
+        if (len > 0)
+            section = buf;
 
         // key will be blank when path is . or ..
         if ((key = strsep(&p, ".")) && streq(key, "")) {

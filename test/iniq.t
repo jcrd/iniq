@@ -70,4 +70,8 @@ test "$(iniq -p indented -m indented.conf)" = "line1=1
 line1=line2=2"
 '
 
+test_expect_success 'Escape section name' '
+test "$(iniq -p escape\\.this\\.section.key escape.conf)" = "true"
+'
+
 test_done

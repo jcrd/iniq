@@ -35,6 +35,8 @@ in_section=false
 default=true
 [section1]
 key1=value1
+[example.com]
+key2=value2
 ```
 
 Print sections in a file:
@@ -42,12 +44,14 @@ Print sections in a file:
 $ iniq example.conf
 DEFAULT
 section1
+example.com
 ```
 
 Exclude DEFAULT section:
 ```
 $ iniq -d example.conf
 section1
+example.com
 ```
 
 Print sectionless key/value pairs:
@@ -98,6 +102,12 @@ Print only the values in section1, using the format _%v_:
 $ iniq -p section1 -f %v example.conf
 true
 value1
+```
+
+Escape section name containing dots:
+```
+$ iniq -d -p example\\.com example.conf
+key2=value2
 ```
 
 ## Used by
