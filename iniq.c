@@ -354,7 +354,7 @@ main(int argc, char *argv[])
                 if (*p != '.')
                     keys = 1;
             } else {
-                len += snprintf(buf + len, BUFSIZ - len, s);
+                len += snprintf(buf + len, BUFSIZ - len, "%s", s);
                 if (buf[len - 1] == '\\') {
                     buf[len - 1] = '.';
                     if (len < BUFSIZ)
