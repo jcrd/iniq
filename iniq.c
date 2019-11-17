@@ -317,10 +317,12 @@ main(int argc, char *argv[])
         }
     }
 
+    const char *file = argv[optind];
+
     atexit(cleanup);
 
     if (optind < argc) {
-        if (ini_parse(argv[optind], handler, c, NULL) < 0)
+        if (ini_parse(file, handler, c, NULL) < 0)
             die("failed to parse %s\n", argv[optind]);
     } else if (!feof(stdin)) {
         if (ini_parse_file(stdin, handler, c, NULL) < 0)
@@ -376,7 +378,7 @@ main(int argc, char *argv[])
     }
 
     if (section && !(s = get_section(section)))
-        die("section %s not found\n", section);
+        die("%s: section '%s' not found\n", file, section);
 
     if (!exclude_default)
         d = get_section("DEFAULT");
@@ -385,14 +387,15 @@ main(int argc, char *argv[])
         if (!print_value(fmt, s, key)) {
             if (section) {
                 if (!d || !print_value(fmt, d, key))
-                    die("key %s not found in section %s\n", key, section);
+                    die("%s: key '%s' not found in section '%s'\n", file, key,
+                            section);
             } else {
-                die("key %s not found\n", key);
+                die("%s: key '%s' not found\n", file, key);
             }
         }
     } else if (section) {
         print_pairs(fmt, s, d, keys);
     } else if (!print_sections(fmt)) {
-        die("ini has no sections\n");
+        die("%s: no sections\n", file);
     }
 }
