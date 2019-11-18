@@ -79,6 +79,8 @@ Show version.
  default=true
  [section1]
  key1=value1
+ [example.com]
+ key2=value2
 
 =item Print sections in a file:
 
@@ -121,6 +123,11 @@ B<iniq> -d -p section1. F<example.conf>
 B<iniq> -p section1.key1 F<example.conf>
  value1
 
+=item Use alternative path separator:
+
+B<iniq> -P , -p example.com,key2 F<example.conf>
+ value2
+
 =item Print values followed by their keys in section1, using the format I<%v:%k>:
 
 B<iniq> -p section1 -f %v:%k F<example.conf>
@@ -132,6 +139,11 @@ B<iniq> -p section1 -f %v:%k F<example.conf>
 B<iniq> -p section1 -f %v F<example.conf>
  true
  value1
+
+=item Escape section name containing dots:
+
+B<iniq> -d -p example\\.com F<example.conf>
+ key2=value2
 
 =back
 
