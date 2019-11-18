@@ -29,6 +29,7 @@ struct section {
 
 static int quiet = 0;
 static int exclude_default = 0;
+static char *path_sep = ".";
 static char *path_dup = NULL;
 static struct section *sections = NULL;
 
@@ -284,6 +285,7 @@ print_usage(int code)
           "  -d          Exclude DEFAULT section from output\n"
           "  -s SEPS     Key/value pair separators (default: '=:')\n"
           "  -m          Parse multi-line entries\n"
+          "  -P SEP      Path separator character (default: '.')\n"
           "  -p PATH     Path specifying sections/keys to print\n"
           "  -f FORMAT   Print output according to FORMAT\n"
           "                where %s = section, %k = key, %v = value\n"
@@ -304,13 +306,14 @@ main(int argc, char *argv[])
     const char *fmt = NULL;
     int opt;
 
-    while ((opt = getopt(argc, argv, "hqds:mp:f:v")) != -1) {
+    while ((opt = getopt(argc, argv, "hqds:mP:p:f:v")) != -1) {
         switch (opt) {
         case 'h': print_usage(EXIT_SUCCESS); break;
         case 'q': quiet = 1; break;
         case 'd': exclude_default = 1; break;
         case 's': c.seps = optarg; break;
         case 'm': c.multi = 1; break;
+        case 'P': path_sep = optarg; break;
         case 'p': path = optarg; break;
         case 'f': fmt = optarg; break;
         case 'v': printf("%s\n", VERSION); exit(EXIT_SUCCESS);
@@ -343,7 +346,7 @@ main(int argc, char *argv[])
         char buf[BUFSIZ];
         char *s;
 
-        while ((s = strsep(&p, "."))) {
+        while ((s = strsep(&p, path_sep))) {
             if (streq(s, "") && len == 0) {
                 // path doesn't specify section
                 section = NO_SECTION;
@@ -353,12 +356,12 @@ main(int argc, char *argv[])
                 /* anticipate a blank key. if the next char is not ., the path is
                    either . (keys is reverted to 0 below) or specifies a key (keys
                    is ignored). if path is .., keys will be set to 1 below */
-                if (*p != '.')
+                if (*p != *path_sep)
                     keys = 1;
             } else {
                 len += snprintf(buf + len, BUFSIZ - len, "%s", s);
                 if (buf[len - 1] == '\\') {
-                    buf[len - 1] = '.';
+                    buf[len - 1] = *path_sep;
                     if (len < BUFSIZ)
                         continue;
                 }
@@ -370,7 +373,7 @@ main(int argc, char *argv[])
             section = buf;
 
         // key will be blank when path is . or ..
-        if ((key = strsep(&p, ".")) && streq(key, "")) {
+        if ((key = strsep(&p, path_sep)) && streq(key, "")) {
             // path doesn't specify key
             key = NULL;
             keys = !keys;

@@ -11,8 +11,8 @@ With no FILE, read standard input.
 =head1 DESCRIPTION
 
 iniq is a simple INI file reader for the command line.
-It queries an INI file based on the path <I<section>>.<I<key>> and allows use of
-custom separators in the file and formatting of the output.
+It queries an INI file based on the path <I<section>><I<separator>><I<key>> and
+allows use of custom separators in the file and formatting of the output.
 Sections inherit keys from a special DEFAULT section unless the I<-d> flag is
 used.
 See below for examples.
@@ -42,13 +42,20 @@ Key/value pair separators. Default is '=:'.
 Parse multi-line entries. An entry spans multiple lines if subsequent lines are
 indented deeper than the first line.
 
+=item B<-P> I<SEPARATOR>
+
+Path separator character. Default is '.'.
+
 =item B<-p> I<PATH>
 
-Path specifying section/key to print. Its format is 'I<section>.I<key>'.
+Path specifying section/key to print.
+Its format is '<I<section>><I<separator>><I<key>>',
+where <I<separator>> is the path separator as specified by the B<-P> flag.
 If no key is provided, all key/value pairs in section are printed.
-If section is followed by a . but no key, key names in section are printed.
+If section is followed by a <I<separator>> but no key, key names in section are
+printed.
 A path without a section will print pairs not in any section.
-The special path '..' will print key names not in any section.
+A path composed of two <I<separator>>s will print key names not in any section.
 
 =item B<-f> I<FORMAT>
 

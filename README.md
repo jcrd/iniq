@@ -1,8 +1,8 @@
 # iniq [![CircleCI](https://circleci.com/gh/jcrd/iniq.svg?style=svg)](https://circleci.com/gh/jcrd/iniq)
 
 **iniq** is a simple INI file reader for the command line.
-It queries an INI file based on the path <_section_>.<_key_> and allows use of
-custom separators in the file and formatting of the output.
+It queries an INI file based on the path <_section_><_separator_><_key_> and
+allows use of custom separators in the file and formatting of the output.
 Sections inherit keys from a special DEFAULT section unless the _-d_ flag is
 used.
 See below for examples.
@@ -20,6 +20,7 @@ options:
   -d          Exclude DEFAULT section from output
   -s SEPS     Key/value pair separators (default: '=:')
   -m          Parse multi-line entries
+  -P SEP      Path separator character (default: '.')
   -p PATH     Path specifying sections/keys to print
   -f FORMAT   Print output according to FORMAT
                 where %s = section, %k = key, %v = value
@@ -88,6 +89,12 @@ Print value of key1 in section1:
 ```
 $ iniq -p section1.key1 example.conf
 value1
+```
+
+Use alternative path separator:
+```
+$ iniq -P , -p example.com,key2 example.conf
+value2
 ```
 
 Print values followed by their keys in section1, using the format _%v:%k_:
