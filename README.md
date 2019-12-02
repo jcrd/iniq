@@ -23,6 +23,7 @@ options:
   -c          Combine sections with the same name
   -P SEP      Path separator character (default: '.')
   -p PATH     Path specifying sections/keys to print
+  -n          Get number of sections with the name given in PATH
   -i NUM      Index of section in PATH
   -f FORMAT   Print output according to FORMAT
                 where %s = section, %k = key, %v = value
@@ -141,6 +142,12 @@ Combine sections with the same name:
 $ iniq -c -p test. multi.conf
 section0
 section1
+```
+
+Get number of sections:
+```
+$ iniq -p test -n multi.conf
+2
 ```
 
 Get section by index:

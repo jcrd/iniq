@@ -64,6 +64,10 @@ key2
 key3"
 '
 
+test_expect_success 'Get number of sections' '
+test "$(iniq -p multi -n multi.conf)" = "2"
+'
+
 test_expect_success 'Get section by index' '
 test "$(iniq -d -p multi. -i 1 multi.conf)" = "key2
 key3"

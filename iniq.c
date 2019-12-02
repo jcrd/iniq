@@ -30,6 +30,7 @@ struct section {
 static int quiet = 0;
 static int exclude_default = 0;
 static int combine_sections = 0;
+static int number_sections = 0;
 static char *path_sep = ".";
 static char *path_dup = NULL;
 static struct section *sections = NULL;
@@ -294,6 +295,7 @@ print_usage(int code)
           "  -c          Combine sections with the same name\n"
           "  -P SEP      Path separator character (default: '.')\n"
           "  -p PATH     Path specifying sections/keys to print\n"
+          "  -n          Get number of sections with the name given in PATH\n"
           "  -i NUM      Index of section in PATH\n"
           "  -f FORMAT   Print output according to FORMAT\n"
           "                where %s = section, %k = key, %v = value\n"
@@ -325,7 +327,7 @@ main(int argc, char *argv[])
     unsigned int section_index = 0;
     int opt;
 
-    while ((opt = getopt(argc, argv, "hqds:mci:P:p:f:v")) != -1) {
+    while ((opt = getopt(argc, argv, "hqds:mcP:p:ni:f:v")) != -1) {
         switch (opt) {
         case 'h': print_usage(EXIT_SUCCESS); break;
         case 'q': quiet = 1; break;
@@ -335,6 +337,7 @@ main(int argc, char *argv[])
         case 'c': combine_sections = 1; break;
         case 'P': path_sep = optarg; break;
         case 'p': path = optarg; break;
+        case 'n': number_sections = 1; break;
         case 'i': section_index = strtoui(optarg); break;
         case 'f': fmt = optarg; break;
         case 'v': printf("%s\n", VERSION); exit(EXIT_SUCCESS);
@@ -401,9 +404,18 @@ main(int argc, char *argv[])
         }
     }
 
-    if (section && !(s = get_section(section, section_index)))
-        die("%s: section '%s' (index %d) not found\n", file, section,
-                section_index);
+    if (section) {
+        if (number_sections) {
+            unsigned int i = 0;
+            while (get_section(section, i))
+                i++;
+            printf("%d\n", i);
+            exit(EXIT_SUCCESS);
+        }
+        if (!(s = get_section(section, section_index)))
+            die("%s: section '%s' (index %d) not found\n", file, section,
+                    section_index);
+    }
 
     if (!exclude_default)
         d = get_section("DEFAULT", 0);

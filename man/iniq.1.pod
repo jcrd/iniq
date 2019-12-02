@@ -61,6 +61,10 @@ printed.
 A path without a section will print pairs not in any section.
 A path composed of two <I<separator>>s will print key names not in any section.
 
+=item B<-n>
+
+Get number of sections with the name given in I<PATH>.
+
 =item B<-i> I<NUM>
 
 Index of section in I<PATH>.
@@ -179,6 +183,11 @@ B<iniq> multi.conf
 B<iniq> -c -p test. multi.conf
  section0
  section1
+
+=item Get number of sections:
+
+B<iniq> -p test -n multi.conf
+ 2
 
 =item Get section by index:
 
