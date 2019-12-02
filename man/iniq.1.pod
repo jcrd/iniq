@@ -42,6 +42,10 @@ Key/value pair separators. Default is '=:'.
 Parse multi-line entries. An entry spans multiple lines if subsequent lines are
 indented deeper than the first line.
 
+=item B<-c>
+
+Combine sections with the same name.
+
 =item B<-P> I<SEPARATOR>
 
 Path separator character. Default is '.'.
@@ -56,6 +60,10 @@ If section is followed by a <I<separator>> but no key, key names in section are
 printed.
 A path without a section will print pairs not in any section.
 A path composed of two <I<separator>>s will print key names not in any section.
+
+=item B<-i> I<NUM>
+
+Index of section in I<PATH>.
 
 =item B<-f> I<FORMAT>
 
@@ -146,6 +154,36 @@ B<iniq> -p section1 -f %v F<example.conf>
 
 B<iniq> -d -p example\\.com F<example.conf>
  key2=value2
+
+=back
+
+Configuration files may contain sections with the same name.
+
+=over
+
+=item Given the file F<multi.conf>:
+
+ [test]
+ section0=0
+ [test]
+ section1=1
+
+=item Print sections:
+
+B<iniq> multi.conf
+ test
+ test
+
+=item Combine sections with the same name:
+
+B<iniq> -c -p test. multi.conf
+ section0
+ section1
+
+=item Get section by index:
+
+B<iniq> -p test. -i 1 multi.conf
+ section1
 
 =back
 

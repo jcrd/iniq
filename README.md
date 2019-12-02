@@ -20,8 +20,10 @@ options:
   -d          Exclude DEFAULT section from output
   -s SEPS     Key/value pair separators (default: '=:')
   -m          Parse multi-line entries
+  -c          Combine sections with the same name
   -P SEP      Path separator character (default: '.')
   -p PATH     Path specifying sections/keys to print
+  -i NUM      Index of section in PATH
   -f FORMAT   Print output according to FORMAT
                 where %s = section, %k = key, %v = value
   -v          Show version
@@ -115,6 +117,36 @@ Escape section name containing dots:
 ```
 $ iniq -d -p example\\.com example.conf
 key2=value2
+```
+
+Configuration files may contain sections with the same name.
+
+Given the configuration file _multi.conf_:
+```
+[test]
+section0=0
+[test]
+section1=1
+```
+
+Print sections:
+```
+$ iniq multi.conf
+test
+test
+```
+
+Combine sections with the same name:
+```
+$ iniq -c -p test. multi.conf
+section0
+section1
+```
+
+Get section by index:
+```
+$ iniq -p test. -i 1 multi.conf
+section1
 ```
 
 ## Used by

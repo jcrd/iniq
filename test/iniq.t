@@ -50,9 +50,23 @@ test "$(iniq -d -f %v:%k -p section1 test.conf)" = "a:keyA
 b:keyB"
 '
 
-test_expect_success 'Get section with multiple declarations' '
-test "$(iniq -p multi. multi.conf)" = "key1
-key2"
+test_expect_success 'List sections with the same name' '
+test "$(iniq multi.conf)" = "DEFAULT
+multi
+multi"
+'
+
+test_expect_success 'Combine sections with the same name' '
+test "$(iniq -c -p multi. multi.conf)" = "default1
+default2
+key1
+key2
+key3"
+'
+
+test_expect_success 'Get section by index' '
+test "$(iniq -d -p multi. -i 1 multi.conf)" = "key2
+key3"
 '
 
 test_expect_success 'Get keys with custom separators' '

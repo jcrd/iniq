@@ -29,6 +29,7 @@ struct section {
 
 static int quiet = 0;
 static int exclude_default = 0;
+static int combine_sections = 0;
 static char *path_sep = ".";
 static char *path_dup = NULL;
 static struct section *sections = NULL;
@@ -213,17 +214,19 @@ handler(void *user, const char *section, const char *key, const char *value)
     // unused user data
     (void)user;
 
-    if (exclude_default && streq(section, "DEFAULT"))
+    int default_section = streq(section, "DEFAULT");
+    struct section *s = NULL;
+    struct section *n;
+
+    if (exclude_default && default_section)
         return 1;
 
-    struct section *s;
-
-    for (s = sections; s; s = s->next) {
-        if (streq(s->name, section))
-            break;
+    for (n = sections; n; n = n->next) {
+        if (streq(n->name, section))
+            s = n;
     }
 
-    if (!s) {
+    if (!s || !(key || default_section || combine_sections)) {
         s = malloc(sizeof(struct section));
         s->name = strdup(section);
         s->pairs = NULL;
@@ -239,6 +242,9 @@ handler(void *user, const char *section, const char *key, const char *value)
             sections = s;
         }
     }
+
+    if (!key)
+        return 1;
 
     struct pair *p = malloc(sizeof(struct pair));
     p->key = strdup(key);
@@ -258,14 +264,14 @@ handler(void *user, const char *section, const char *key, const char *value)
 }
 
 static struct section *
-get_section(const char *name)
+get_section(const char *name, unsigned int i)
 {
     // keys with no section are stored under "" section in inih
     if (streq(name, NO_SECTION))
         name = "";
 
     for (struct section *s = sections; s; s = s->next) {
-        if (streq(s->name, name))
+        if (streq(s->name, name) && i-- == 0)
             return s;
     }
 
@@ -285,14 +291,26 @@ print_usage(int code)
           "  -d          Exclude DEFAULT section from output\n"
           "  -s SEPS     Key/value pair separators (default: '=:')\n"
           "  -m          Parse multi-line entries\n"
+          "  -c          Combine sections with the same name\n"
           "  -P SEP      Path separator character (default: '.')\n"
           "  -p PATH     Path specifying sections/keys to print\n"
+          "  -i NUM      Index of section in PATH\n"
           "  -f FORMAT   Print output according to FORMAT\n"
           "                where %s = section, %k = key, %v = value\n"
           "  -v          Show version\n",
           code ? stderr : stdout);
 
     exit(code);
+}
+
+static unsigned int
+strtoui(const char *str)
+{
+    char *endptr;
+    unsigned int i = strtoul(str, &endptr, 10);
+    if (*endptr != '\0')
+        die("invalid integer: %s\n", str);
+    return i;
 }
 
 int
@@ -304,17 +322,20 @@ main(int argc, char *argv[])
     };
     const char *path = NULL;
     const char *fmt = NULL;
+    unsigned int section_index = 0;
     int opt;
 
-    while ((opt = getopt(argc, argv, "hqds:mP:p:f:v")) != -1) {
+    while ((opt = getopt(argc, argv, "hqds:mci:P:p:f:v")) != -1) {
         switch (opt) {
         case 'h': print_usage(EXIT_SUCCESS); break;
         case 'q': quiet = 1; break;
         case 'd': exclude_default = 1; break;
         case 's': c.seps = optarg; break;
         case 'm': c.multi = 1; break;
+        case 'c': combine_sections = 1; break;
         case 'P': path_sep = optarg; break;
         case 'p': path = optarg; break;
+        case 'i': section_index = strtoui(optarg); break;
         case 'f': fmt = optarg; break;
         case 'v': printf("%s\n", VERSION); exit(EXIT_SUCCESS);
         }
@@ -380,11 +401,12 @@ main(int argc, char *argv[])
         }
     }
 
-    if (section && !(s = get_section(section)))
-        die("%s: section '%s' not found\n", file, section);
+    if (section && !(s = get_section(section, section_index)))
+        die("%s: section '%s' (index %d) not found\n", file, section,
+                section_index);
 
     if (!exclude_default)
-        d = get_section("DEFAULT");
+        d = get_section("DEFAULT", 0);
 
     if (key) {
         if (!print_value(fmt, s, key)) {

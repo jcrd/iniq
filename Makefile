@@ -5,7 +5,8 @@ PREFIX ?= /usr/local
 BINPREFIX ?= $(PREFIX)/bin
 MANPREFIX ?= $(PREFIX)/share/man
 
-CPPFLAGS += -D_DEFAULT_SOURCE -DVERSION=\"$(VERSION)\"
+CPPFLAGS += -D_DEFAULT_SOURCE -DVERSION=\"$(VERSION)\" \
+			-DINI_CALL_HANDLER_ON_NEW_SECTION=1
 CFLAGS += -std=c99 -pedantic -Wall -Wextra
 
 OBJ = iniq.o inih/ini.o
