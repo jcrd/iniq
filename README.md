@@ -151,6 +151,7 @@ section1
 
 ## Used by
 
+* [passless](https://github.com/jcrd/passless)
 * [hdparmify](https://github.com/jcrd/hdparmify)
 * [auto-inhibit](https://github.com/jcrd/auto-inhibit)
 
