@@ -87,11 +87,13 @@ Show version.
 B<iniq> F<example.conf>
  DEFAULT
  section1
+ example.com
 
 =item Exclude DEFAULT section:
 
 B<iniq> -d F<example.conf>
  section1
+ example.com
 
 =item Print sectionless key/value pairs:
 
