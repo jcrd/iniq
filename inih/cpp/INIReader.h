@@ -1,5 +1,9 @@
 // Read an INI file into easy-to-access name/value pairs.
 
+// SPDX-License-Identifier: BSD-3-Clause
+
+// Copyright (C) 2009-2019, Ben Hoyt
+
 // inih and INIReader are released under the New BSD license (see LICENSE.txt).
 // Go to the project home page for more info:
 //
@@ -27,7 +31,7 @@ public:
     // Get a string value from INI file, returning default_value if not found.
     std::string Get(const std::string& section, const std::string& name,
                     const std::string& default_value) const;
-    
+
     // Get a string value from INI file, returning default_value if not found,
     // empty, or contains only whitespace.
     std::string GetString(const std::string& section, const std::string& name,
@@ -46,6 +50,10 @@ public:
     // not a valid true/false value. Valid true values are "true", "yes", "on", "1",
     // and valid false values are "false", "no", "off", "0" (not case sensitive).
     bool GetBoolean(const std::string& section, const std::string& name, bool default_value) const;
+
+    // Return true if the given section exists (section must contain at least
+    // one name=value pair).
+    bool HasSection(const std::string& section) const;
 
     // Return true if a value exists with the given section and field names.
     bool HasValue(const std::string& section, const std::string& name) const;
