@@ -410,7 +410,7 @@ main(int argc, char *argv[])
             while (get_section(section, i))
                 i++;
             printf("%d\n", i);
-            exit(EXIT_SUCCESS);
+            exit(i > 0 ? EXIT_SUCCESS : EXIT_FAILURE);
         }
         if (!(s = get_section(section, section_index)))
             die("%s: section '%s' (index %d) not found\n", file, section,
