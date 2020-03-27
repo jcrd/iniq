@@ -27,6 +27,7 @@ options:
   -i NUM      Index of section in PATH
   -f FORMAT   Print output according to FORMAT
                 where %s = section, %k = key, %v = value
+  -o          Output sections, keys, and values
   -v          Show version
 ```
 
@@ -118,6 +119,14 @@ Escape section name containing dots:
 ```
 $ iniq -d -p example\\.com example.conf
 key2=value2
+```
+
+Output sections, keys, and values:
+```
+$ iniq -f '%k:%v' -o example.conf
+section: in_section:false
+section:section1 default:true key1:value1
+section:example.com default:true key2:value2
 ```
 
 Configuration files may contain sections with the same name.

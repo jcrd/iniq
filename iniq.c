@@ -104,7 +104,7 @@ quote_str(const char *str, char **out)
 }
 
 static void
-print_pair(const char *fmt, struct pair *p, int keys)
+print_pair(const char *fmt, struct pair *p, int keys, int sep)
 {
     char *key, *val;
     int qkey = quote_str(p->key, &key);
@@ -113,9 +113,11 @@ print_pair(const char *fmt, struct pair *p, int keys)
 
     if (!fmt) {
         if (keys)
-            printf("%s\n", key);
+            printf("%s", key);
         else
-            printf("%s=%s\n", key, val);
+            printf("%s=%s", key, val);
+        if (sep > 0)
+            printf("%c", sep);
         if (qkey) free(key);
         if (qval) free(val);
         return;
@@ -145,7 +147,8 @@ print_pair(const char *fmt, struct pair *p, int keys)
         printf(fmt, val, key);
     else
         printf(fmt, key, val);
-    printf("\n");
+    if (sep > 0)
+        printf("%c", sep);
 
     free((void *)fmt);
     if (qkey) free(key);
@@ -153,24 +156,34 @@ print_pair(const char *fmt, struct pair *p, int keys)
 }
 
 static int
-print_pairs(const char *fmt, struct section *s, struct section *d, int keys)
+print_pairs(const char *fmt, struct section *s, struct section *d, int keys,
+        int sep, int dry_run)
 {
     int i = 0;
 
     if (d) {
         // print keys inherited from DEFAULT if key is not redefined in section
-        for (struct pair *dp = d->pairs; dp; dp = dp->next, i++) {
+        for (struct pair *dp = d->pairs; dp; dp = dp->next) {
             for (struct pair *sp = s->pairs; sp; sp = sp->next) {
                 if (streq(dp->key, sp->key))
                     goto outer;
             }
-            print_pair(fmt, dp, keys);
+            if (!dry_run) {
+                if (i > 0)
+                    printf("%c", sep);
+                print_pair(fmt, dp, keys, -1);
+            }
+            i++;
         outer: continue;
         }
+
+        if (!dry_run && i > 0 && s->pairs)
+            printf("%c", sep);
     }
 
     for (struct pair *p = s->pairs; p; p = p->next, i++)
-        print_pair(fmt, p, keys);
+        if (!dry_run)
+            print_pair(fmt, p, keys, p->next ? sep : -1);
 
     return i;
 }
@@ -201,12 +214,32 @@ print_value(const char *fmt, struct section *s, const char *key)
 
     for (struct pair *p = s->pairs; p; p = p->next) {
         if (streq(p->key, key)) {
-            print_pair(fmt ? fmt : "%v", p, 0);
+            print_pair(fmt ? fmt : "%v", p, 0, '\n');
             return 1;
         }
     }
 
     return 0;
+}
+
+static int
+print_output(const char *fmt, struct section *d)
+{
+    int i = 0;
+
+    for (struct section *s = sections; s; s = s->next, i++) {
+        if (streq(s->name, "DEFAULT"))
+            continue;
+        struct pair p = {"section", s->name, NULL};
+        print_pair(fmt, &p, 0, -1);
+        // dry run to count keys
+        if (print_pairs(fmt, s, d, 0, -1, 1))
+            printf("%c", ' ');
+        print_pairs(fmt, s, d, 0, ' ', 0);
+        printf("\n");
+    }
+
+    return i;
 }
 
 static int
@@ -299,6 +332,7 @@ print_usage(int code)
           "  -i NUM      Index of section in PATH\n"
           "  -f FORMAT   Print output according to FORMAT\n"
           "                where %s = section, %k = key, %v = value\n"
+          "  -o          Output sections, keys, and values\n"
           "  -v          Show version\n",
           code ? stderr : stdout);
 
@@ -325,9 +359,10 @@ main(int argc, char *argv[])
     const char *path = NULL;
     const char *fmt = NULL;
     unsigned int section_index = 0;
+    unsigned int output = 0;
     int opt;
 
-    while ((opt = getopt(argc, argv, "hqds:mcP:p:ni:f:v")) != -1) {
+    while ((opt = getopt(argc, argv, "hqds:mcP:p:ni:f:ov")) != -1) {
         switch (opt) {
         case 'h': print_usage(EXIT_SUCCESS); break;
         case 'q': quiet = 1; break;
@@ -340,6 +375,7 @@ main(int argc, char *argv[])
         case 'n': number_sections = 1; break;
         case 'i': section_index = strtoui(optarg); break;
         case 'f': fmt = optarg; break;
+        case 'o': output = 1; break;
         case 'v': printf("%s\n", VERSION); exit(EXIT_SUCCESS);
         }
     }
@@ -420,6 +456,9 @@ main(int argc, char *argv[])
     if (!exclude_default)
         d = get_section("DEFAULT", 0);
 
+    if (output)
+        exit(print_output(fmt, d) > 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+
     if (key) {
         if (!print_value(fmt, s, key)) {
             if (section) {
@@ -431,7 +470,8 @@ main(int argc, char *argv[])
             }
         }
     } else if (section) {
-        print_pairs(fmt, s, d, keys);
+        print_pairs(fmt, s, d, keys, '\n', 0);
+        printf("\n");
     } else if (!print_sections(fmt)) {
         die("%s: no sections\n", file);
     }

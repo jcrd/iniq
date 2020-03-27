@@ -32,7 +32,8 @@ keyB"
 '
 
 test_expect_success 'Get keys not in any section' '
-test "$(iniq -p .. test.conf)" = "no_section" &&
+test "$(iniq -p .. test.conf)" = "no_section
+free" &&
 test "$(iniq -p .no_section test.conf)" = "true"
 '
 
@@ -94,6 +95,29 @@ test "$(iniq -p escape\\.this\\.section.key escape.conf)" = "true"
 
 test_expect_success 'Use alternative path separator' '
 test "$(iniq -P , -p escape.this.section,key escape.conf)" = "true"
+'
+
+test_expect_success 'Output all' '
+test "$(iniq -o test.conf)" = "section= default=true no_section=true free=1
+section=section1 default=true keyA=a keyB=b"
+'
+
+test_expect_success 'Output all (with format)' '
+test "$(iniq -f "%k:%v" -o -d test.conf)" = "section: no_section:true free:1
+section:section1 keyA:a keyB:b"
+'
+
+test_expect_success 'Output all (multi)' '
+test "$(iniq -o -d multi.conf)" = "section=multi key1=1
+section=multi key2=2 key3=3"
+'
+
+test_expect_success 'Output all (keyless)' '
+test "$(iniq -o keyless.conf)" = "section=keyless inherited=true"
+'
+
+test_expect_success 'Output all (keyless, exclude DEFAULT)' '
+test "$(iniq -o -d keyless.conf)" = "section=keyless"
 '
 
 test_done

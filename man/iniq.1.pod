@@ -74,6 +74,15 @@ Index of section in I<PATH>.
 Print output according to I<FORMAT>, where %s, %k, and %v are replaced by the
 section, key, and value respectively.
 
+=item B<-o>
+
+Output sections, keys, and values according to I<FORMAT> if specified.
+In this case, only %k and %v are used.
+
+Output will have the following format, with one section per line:
+ section=name1 key=value
+ section=name2 key=value
+
 =item B<-v>
 
 Show version.
@@ -158,6 +167,13 @@ B<iniq> -p section1 -f %v F<example.conf>
 
 B<iniq> -d -p example\\.com F<example.conf>
  key2=value2
+
+=item Output sections, keys, and values:
+
+B<iniq> -f %k:%v -o F<example.conf>
+ section: in_section:false
+ section:section1 default:true key1:value1
+ section:example.com default:true key2:value2
 
 =back
 
