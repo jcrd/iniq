@@ -25,9 +25,12 @@ test_expect_success 'Get keys inherited from DEFAULT' '
 test "$(iniq -p section1.default test.conf)" = "true"
 '
 
-test_expect_success 'Exclude DEFAULT' '
-test "$(iniq -d test.conf)" = "section1" &&
-test "$(iniq -d -p section1. test.conf)" = "keyA
+test_expect_success 'Exclude DEFAULT from section list' '
+test "$(iniq -d test.conf)" = "section1"
+'
+
+test_expect_success 'Disable DEFAULT' '
+test "$(iniq -D -p section1. test.conf)" = "keyA
 keyB"
 '
 
@@ -43,11 +46,11 @@ test "$(iniq -f ^%s$ test.conf)" = "^DEFAULT$
 '
 
 test_expect_success 'Format key/value output' '
-test "$(iniq -d -f ^%k$ -p section1 test.conf)" = "^keyA$
+test "$(iniq -D -f ^%k$ -p section1 test.conf)" = "^keyA$
 ^keyB$" &&
-test "$(iniq -d -f ^%v$ -p section1 test.conf)" = "^a$
+test "$(iniq -D -f ^%v$ -p section1 test.conf)" = "^a$
 ^b$" &&
-test "$(iniq -d -f %v:%k -p section1 test.conf)" = "a:keyA
+test "$(iniq -D -f %v:%k -p section1 test.conf)" = "a:keyA
 b:keyB"
 '
 
@@ -70,7 +73,7 @@ test "$(iniq -p multi -n multi.conf)" = "2"
 '
 
 test_expect_success 'Get section by index' '
-test "$(iniq -d -p multi. -i 1 multi.conf)" = "key2
+test "$(iniq -D -p multi. -i 1 multi.conf)" = "key2
 key3"
 '
 
@@ -99,25 +102,32 @@ test "$(iniq -P , -p escape.this.section,key escape.conf)" = "true"
 
 test_expect_success 'Output all' '
 test "$(iniq -o test.conf)" = "section= default=true no_section=true free=1
+section=DEFAULT default=true
+section=section1 default=true keyA=a keyB=b"
+'
+
+test_expect_success 'Output all (exclude DEFAULT)' '
+test "$(iniq -o -d test.conf)" = "section= default=true no_section=true free=1
 section=section1 default=true keyA=a keyB=b"
 '
 
 test_expect_success 'Output all (with format)' '
-test "$(iniq -f "%k:%v" -o -d test.conf)" = "section: no_section:true free:1
+test "$(iniq -f "%k:%v" -o -D test.conf)" = "section: no_section:true free:1
 section:section1 keyA:a keyB:b"
 '
 
 test_expect_success 'Output all (multi)' '
-test "$(iniq -o -d multi.conf)" = "section=multi key1=1
+test "$(iniq -o -D multi.conf)" = "section=multi key1=1
 section=multi key2=2 key3=3"
 '
 
 test_expect_success 'Output all (keyless)' '
-test "$(iniq -o keyless.conf)" = "section=keyless inherited=true"
+test "$(iniq -o keyless.conf)" = "section=DEFAULT inherited=true
+section=keyless inherited=true"
 '
 
-test_expect_success 'Output all (keyless, exclude DEFAULT)' '
-test "$(iniq -o -d keyless.conf)" = "section=keyless"
+test_expect_success 'Output all (keyless, disable DEFAULT)' '
+test "$(iniq -o -D keyless.conf)" = "section=keyless"
 '
 
 test_done

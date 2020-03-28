@@ -13,6 +13,7 @@
 #endif /* VERSION */
 
 #define NO_SECTION "."
+#define DEFAULT_SECTION "DEFAULT"
 #define streq(s1, s2) (strcmp((s1), (s2)) == 0)
 
 struct pair {
@@ -29,6 +30,7 @@ struct section {
 
 static int quiet = 0;
 static int exclude_default = 0;
+static int disable_default = 0;
 static int combine_sections = 0;
 static int number_sections = 0;
 static char *path_sep = ".";
@@ -197,7 +199,8 @@ print_sections(const char *fmt)
     int i = 0;
 
     for (struct section *s = sections; s; s = s->next, i++) {
-        if (!strlen(s->name))
+        if (!strlen(s->name) ||
+                (exclude_default && streq(s->name, DEFAULT_SECTION)))
             continue;
         printf(fmt ? fmt : "%s", s->name);
         printf("\n");
@@ -228,7 +231,7 @@ print_output(const char *fmt, struct section *d)
     int i = 0;
 
     for (struct section *s = sections; s; s = s->next, i++) {
-        if (streq(s->name, "DEFAULT"))
+        if (exclude_default && streq(s->name, DEFAULT_SECTION))
             continue;
         struct pair p = {"section", s->name, NULL};
         print_pair(fmt, &p, 0, -1);
@@ -248,11 +251,11 @@ handler(void *user, const char *section, const char *key, const char *value)
     // unused user data
     (void)user;
 
-    int default_section = streq(section, "DEFAULT");
+    int default_section = streq(section, DEFAULT_SECTION);
     struct section *s = NULL;
     struct section *n;
 
-    if (exclude_default && default_section)
+    if (disable_default && default_section)
         return 1;
 
     for (n = sections; n; n = n->next) {
@@ -322,7 +325,8 @@ print_usage(int code)
           "options:\n"
           "  -h          Show help message\n"
           "  -q          Suppress error messages\n"
-          "  -d          Exclude DEFAULT section from output\n"
+          "  -d          Exclude DEFAULT section from section list\n"
+          "  -D          Disable inheriting of DEFAULT section\n"
           "  -s SEPS     Key/value pair separators (default: '=:')\n"
           "  -m          Parse multi-line entries\n"
           "  -c          Combine sections with the same name\n"
@@ -362,11 +366,12 @@ main(int argc, char *argv[])
     unsigned int output = 0;
     int opt;
 
-    while ((opt = getopt(argc, argv, "hqds:mcP:p:ni:f:ov")) != -1) {
+    while ((opt = getopt(argc, argv, "hqdDs:mcP:p:ni:f:ov")) != -1) {
         switch (opt) {
         case 'h': print_usage(EXIT_SUCCESS); break;
         case 'q': quiet = 1; break;
         case 'd': exclude_default = 1; break;
+        case 'D': disable_default = 1; break;
         case 's': c.seps = optarg; break;
         case 'm': c.multi = 1; break;
         case 'c': combine_sections = 1; break;
@@ -411,7 +416,7 @@ main(int argc, char *argv[])
                 // path doesn't specify section
                 section = NO_SECTION;
                 // only real sections inherit DEFAULT section
-                exclude_default = 1;
+                disable_default = 1;
 
                 /* anticipate a blank key. if the next char is not ., the path is
                    either . (keys is reverted to 0 below) or specifies a key (keys
@@ -453,8 +458,8 @@ main(int argc, char *argv[])
                     section_index);
     }
 
-    if (!exclude_default)
-        d = get_section("DEFAULT", 0);
+    if (!disable_default)
+        d = get_section(DEFAULT_SECTION, 0);
 
     if (output)
         exit(print_output(fmt, d) > 0 ? EXIT_SUCCESS : EXIT_FAILURE);

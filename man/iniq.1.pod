@@ -13,7 +13,7 @@ With no FILE, read standard input.
 iniq is a simple INI file reader for the command line.
 It queries an INI file based on the path <I<section>><I<separator>><I<key>> and
 allows use of custom separators in the file and formatting of the output.
-Sections inherit keys from a special DEFAULT section unless the I<-d> flag is
+Sections inherit keys from a special DEFAULT section unless the I<-D> flag is
 used.
 See below for examples.
 
@@ -31,7 +31,11 @@ Suppress error messages.
 
 =item B<-d>
 
-Exclude DEFAULT section from output.
+Exclude DEFAULT section from section list.
+
+=item B<-D>
+
+Disable inheriting of DEFAULT section.
 
 =item B<-s> I<SEPARATORS>
 
@@ -131,14 +135,14 @@ B<iniq> -p .. F<example.conf>
 B<iniq> -p .in_section F<example.conf>
  false
 
-=item Print key/value pairs in section1, excluding DEFAULT:
+=item Print key/value pairs in section1, disabling DEFAULT:
 
-B<iniq> -d -p section1 F<example.conf>
+B<iniq> -D -p section1 F<example.conf>
  key1=value1
 
-=item Print keys in section1, excluding DEFAULT:
+=item Print keys in section1, disabling DEFAULT:
 
-B<iniq> -d -p section1. F<example.conf>
+B<iniq> -D -p section1. F<example.conf>
  key1
 
 =item Print value of key1 in section1:
@@ -165,7 +169,7 @@ B<iniq> -p section1 -f %v F<example.conf>
 
 =item Escape section name containing dots:
 
-B<iniq> -d -p example\\.com F<example.conf>
+B<iniq> -D -p example\\.com F<example.conf>
  key2=value2
 
 =item Output sections, keys, and values:

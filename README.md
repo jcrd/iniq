@@ -3,7 +3,7 @@
 **iniq** is a simple INI file reader for the command line.
 It queries an INI file based on the path <_section_><_separator_><_key_> and
 allows use of custom separators in the file and formatting of the output.
-Sections inherit keys from a special DEFAULT section unless the _-d_ flag is
+Sections inherit keys from a special DEFAULT section unless the _-D_ flag is
 used.
 See below for examples.
 
@@ -17,7 +17,8 @@ With no FILE, read standard input.
 options:
   -h          Show help message
   -q          Suppress error messages
-  -d          Exclude DEFAULT section from output
+  -d          Exclude DEFAULT section from section list
+  -D          Disable inheriting of DEFAULT section
   -s SEPS     Key/value pair separators (default: '=:')
   -m          Parse multi-line entries
   -c          Combine sections with the same name
@@ -77,15 +78,15 @@ $ iniq -p .in_section example.conf
 false
 ```
 
-Print key/value pairs in section1, excluding DEFAULT:
+Print key/value pairs in section1, disabling DEFAULT:
 ```
-$ iniq -d -p section1 example.conf
+$ iniq -D -p section1 example.conf
 key1=value1
 ```
 
-Print keys in section1, excluding DEFAULT:
+Print keys in section1, disabling DEFAULT:
 ```
-$ iniq -d -p section1. example.conf
+$ iniq -D -p section1. example.conf
 key1
 ```
 
@@ -117,7 +118,7 @@ value1
 
 Escape section name containing dots:
 ```
-$ iniq -d -p example\\.com example.conf
+$ iniq -D -p example\\.com example.conf
 key2=value2
 ```
 
