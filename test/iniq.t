@@ -7,13 +7,11 @@ test_description='Test iniq'
 cd "$SHARNESS_TEST_DIRECTORY" || exit 1
 
 test_expect_success 'List sections in file' '
-test "$(iniq test.conf)" = "DEFAULT
-section1"
+test "$(iniq test.conf)" = "section1"
 '
 
 test_expect_success 'List sections from stdin' '
-test "$(cat test.conf | iniq)" = "DEFAULT
-section1"
+test "$(cat test.conf | iniq)" = "section1"
 '
 
 test_expect_success 'Get keys from section' '
@@ -25,8 +23,9 @@ test_expect_success 'Get keys inherited from DEFAULT' '
 test "$(iniq -p section1.default test.conf)" = "true"
 '
 
-test_expect_success 'Exclude DEFAULT from section list' '
-test "$(iniq -d test.conf)" = "section1"
+test_expect_success 'Include DEFAULT in section list' '
+test "$(iniq -d test.conf)" = "DEFAULT
+section1"
 '
 
 test_expect_success 'Disable DEFAULT' '
@@ -41,7 +40,7 @@ test "$(iniq -p .no_section test.conf)" = "true"
 '
 
 test_expect_success 'Format section output' '
-test "$(iniq -f ^%s$ test.conf)" = "^DEFAULT$
+test "$(iniq -d -f ^%s$ test.conf)" = "^DEFAULT$
 ^section1$"
 '
 
@@ -55,8 +54,7 @@ b:keyB"
 '
 
 test_expect_success 'List sections with the same name' '
-test "$(iniq multi.conf)" = "DEFAULT
-multi
+test "$(iniq multi.conf)" = "multi
 multi"
 '
 
@@ -102,12 +100,12 @@ test "$(iniq -P , -p escape.this.section,key escape.conf)" = "true"
 
 test_expect_success 'Output all' '
 test "$(iniq -o test.conf)" = "section= default=true no_section=true free=1
-section=DEFAULT default=true
 section=section1 default=true keyA=a keyB=b"
 '
 
-test_expect_success 'Output all (exclude DEFAULT)' '
+test_expect_success 'Output all (include DEFAULT)' '
 test "$(iniq -o -d test.conf)" = "section= default=true no_section=true free=1
+section=DEFAULT default=true
 section=section1 default=true keyA=a keyB=b"
 '
 
@@ -122,7 +120,7 @@ section=multi key2=2 key3=3"
 '
 
 test_expect_success 'Output all (keyless)' '
-test "$(iniq -o keyless.conf)" = "section=DEFAULT inherited=true
+test "$(iniq -o -d keyless.conf)" = "section=DEFAULT inherited=true
 section=keyless inherited=true"
 '
 

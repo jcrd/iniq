@@ -17,7 +17,7 @@ With no FILE, read standard input.
 options:
   -h          Show help message
   -q          Suppress error messages
-  -d          Exclude DEFAULT section from section list
+  -d          Include DEFAULT section in section list
   -D          Disable inheriting of DEFAULT section
   -s SEPS     Key/value pair separators (default: '=:')
   -m          Parse multi-line entries
@@ -48,14 +48,14 @@ key2=value2
 Print sections in a file:
 ```
 $ iniq example.conf
-DEFAULT
 section1
 example.com
 ```
 
-Exclude DEFAULT section:
+Include DEFAULT section:
 ```
 $ iniq -d example.conf
+DEFAULT
 section1
 example.com
 ```

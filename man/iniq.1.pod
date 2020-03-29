@@ -31,7 +31,7 @@ Suppress error messages.
 
 =item B<-d>
 
-Exclude DEFAULT section from section list.
+Include DEFAULT section in section list.
 
 =item B<-D>
 
@@ -110,13 +110,13 @@ Show version.
 =item Print sections in a file:
 
 B<iniq> F<example.conf>
- DEFAULT
  section1
  example.com
 
-=item Exclude DEFAULT section:
+=item Include DEFAULT section:
 
 B<iniq> -d F<example.conf>
+ DEFAULT
  section1
  example.com
 

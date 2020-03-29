@@ -29,7 +29,7 @@ struct section {
 };
 
 static int quiet = 0;
-static int exclude_default = 0;
+static int include_default = 0;
 static int disable_default = 0;
 static int combine_sections = 0;
 static int number_sections = 0;
@@ -200,7 +200,7 @@ print_sections(const char *fmt)
 
     for (struct section *s = sections; s; s = s->next, i++) {
         if (!strlen(s->name) ||
-                (exclude_default && streq(s->name, DEFAULT_SECTION)))
+                (!include_default && streq(s->name, DEFAULT_SECTION)))
             continue;
         printf(fmt ? fmt : "%s", s->name);
         printf("\n");
@@ -231,7 +231,7 @@ print_output(const char *fmt, struct section *d)
     int i = 0;
 
     for (struct section *s = sections; s; s = s->next, i++) {
-        if (exclude_default && streq(s->name, DEFAULT_SECTION))
+        if (!include_default && streq(s->name, DEFAULT_SECTION))
             continue;
         struct pair p = {"section", s->name, NULL};
         print_pair(fmt, &p, 0, -1);
@@ -325,7 +325,7 @@ print_usage(int code)
           "options:\n"
           "  -h          Show help message\n"
           "  -q          Suppress error messages\n"
-          "  -d          Exclude DEFAULT section from section list\n"
+          "  -d          Include DEFAULT section in section list\n"
           "  -D          Disable inheriting of DEFAULT section\n"
           "  -s SEPS     Key/value pair separators (default: '=:')\n"
           "  -m          Parse multi-line entries\n"
@@ -370,7 +370,7 @@ main(int argc, char *argv[])
         switch (opt) {
         case 'h': print_usage(EXIT_SUCCESS); break;
         case 'q': quiet = 1; break;
-        case 'd': exclude_default = 1; break;
+        case 'd': include_default = 1; break;
         case 'D': disable_default = 1; break;
         case 's': c.seps = optarg; break;
         case 'm': c.multi = 1; break;
