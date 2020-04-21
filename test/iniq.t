@@ -71,6 +71,7 @@ test "$(iniq -p multi -n multi.conf)" = "2"
 '
 
 test_expect_success 'Get section by index' '
+test "$(iniq -D -p multi. -i 0 multi.conf)" = "key1" &&
 test "$(iniq -D -p multi. -i 1 multi.conf)" = "key2
 key3"
 '
