@@ -226,4 +226,4 @@ Bugs and issues can be reported here: L<https://github.com/jcrd/iniq/issues>
 
 =head1 COPYRIGHT
 
-Copyright 2018 James Reed. iniq is licensed under the New BSD License.
+Copyright 2018-2020 James Reed. iniq is licensed under the New BSD License.
