@@ -8,7 +8,8 @@ URL: https://github.com/jcrd/iniq
 VCS: {{{ git_vcs }}}
 Source0: {{{ git_pack }}}
 
-BuildRequires: gcc perl
+BuildRequires: gcc
+BuildRequires: perl
 
 %global debug_package %{nil}
 

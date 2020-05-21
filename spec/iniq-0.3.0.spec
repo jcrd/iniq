@@ -7,7 +7,8 @@ License: BSD-3-Clause
 URL: https://github.com/jcrd/iniq
 Source0: https://github.com/jcrd/iniq/archive/v0.3.0.tar.gz
 
-BuildRequires: gcc perl
+BuildRequires: gcc
+BuildRequires: perl
 
 %global debug_package %{nil}
 
