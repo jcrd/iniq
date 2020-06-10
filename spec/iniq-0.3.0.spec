@@ -24,6 +24,9 @@ iniq is a simple INI file reader for the command line. It queries an INI file ba
 %install
 %make_install PREFIX=/usr
 
+%check
+make test
+
 %files
 %license LICENSE
 %doc README.md
