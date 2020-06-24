@@ -1,4 +1,4 @@
-# iniq [![CircleCI](https://circleci.com/gh/jcrd/iniq.svg?style=svg)](https://circleci.com/gh/jcrd/iniq) [![Copr build status](https://copr.fedorainfracloud.org/coprs/jcrd/iniq/package/iniq/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/jcrd/iniq/package/iniq/)
+# iniq [![CircleCI](https://circleci.com/gh/jcrd/iniq.svg?style=svg)](https://circleci.com/gh/jcrd/iniq)
 
 **iniq** is a simple INI file reader for the command line.
 It queries an INI file based on the path <_section_><_separator_><_key_> and
@@ -6,6 +6,16 @@ allows use of custom separators in the file and formatting of the output.
 Sections inherit keys from a special DEFAULT section unless the _-D_ flag is
 used.
 See below for examples.
+
+## Packages
+
+* **RPM** package available from [copr][1]. [![Copr build status](https://copr.fedorainfracloud.org/coprs/jcrd/iniq/package/iniq/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/jcrd/iniq/package/iniq/)
+
+  Install with:
+  ```
+  dnf copr enable jcrd/iniq
+  dnf install iniq
+  ```
 
 ## Usage
 
@@ -179,3 +189,5 @@ This project is licensed under the New BSD License (see [LICENSE](LICENSE)).
 ## Acknowledgements
 
 * Built with [inih](https://github.com/benhoyt/inih)
+
+[1]: https://copr.fedorainfracloud.org/coprs/jcrd/iniq/
