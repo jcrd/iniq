@@ -1,1 +1,3 @@
 FROM supplantr/toolbox
+
+RUN dnf install -y gcc
