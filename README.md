@@ -1,4 +1,4 @@
-# iniq [![CircleCI](https://circleci.com/gh/jcrd/iniq.svg?style=svg)](https://circleci.com/gh/jcrd/iniq)
+# iniq ![test](https://github.com/jcrd/iniq/actions/workflows/test.yml/badge.svg)
 
 **iniq** is a simple INI file reader for the command line.
 It queries an INI file based on the path <_section_><_separator_><_key_> and
