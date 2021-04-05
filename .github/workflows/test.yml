@@ -8,8 +8,6 @@ jobs:
     container: supplantr/iniq:latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
       - name: Build
         run: make iniq
