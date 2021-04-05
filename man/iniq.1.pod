@@ -218,7 +218,7 @@ B<iniq> -p test. -i 1 multi.conf
 
 =head1 AUTHOR
 
-James Reed E<lt>jcrd@tuta.ioE<gt>
+James Reed E<lt>james@twiddlingbits.netE<gt>
 
 =head1 REPORTING BUGS
 
