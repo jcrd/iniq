@@ -1,4 +1,12 @@
-# iniq ![test](https://github.com/jcrd/iniq/actions/workflows/test.yml/badge.svg)
+# iniq
+
+[![test][test-badge]][test]
+[![CodeQL][codeql-badge]][codeql]
+
+[test-badge]: https://github.com/jcrd/iniq/actions/workflows/test.yml/badge.svg
+[test]: https://github.com/jcrd/iniq/actions/workflows/test.yml
+[codeql-badge]: https://github.com/jcrd/iniq/actions/workflows/codeql-analysis.yml/badge.svg
+[codeql]: https://github.com/jcrd/iniq/actions/workflows/codeql-analysis.yml
 
 **iniq** is a simple INI file reader for the command line.
 It queries an INI file based on the path <_section_><_separator_><_key_> and
