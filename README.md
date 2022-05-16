@@ -47,6 +47,8 @@ options:
   -f FORMAT   Print output according to FORMAT
                 where %s = section, %k = key, %v = value
   -o          Output sections, keys, and values
+  -O FILTER   Output according to FILTER
+                where FILTER is a comma-separated list of keys
   -v          Show version
 ```
 
@@ -146,6 +148,13 @@ $ iniq -f '%k:%v' -o example.conf
 section: in_section:false
 section:section1 default:true key1:value1
 section:example.com default:true key2:value2
+```
+
+Output sections, keys, and values according to a filter:
+```
+$ iniq -O in_section,key1 example.conf
+section= in_section=false
+section=section1 key1=value1
 ```
 
 Configuration files may contain sections with the same name.

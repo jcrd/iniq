@@ -105,6 +105,61 @@ quote_str(const char *str, char **out)
     return 1;
 }
 
+char **
+split_str(char *str, const char delim)
+{
+    char *tmp = str;
+    char *last_delim = NULL;
+    int len = 0;
+
+    // count delimiters to determine length
+    while (*tmp) {
+        if (*tmp == delim) {
+            len++;
+            last_delim = tmp;
+        }
+        tmp++;
+    }
+    // add space for last token
+    len += last_delim < (str + strlen(str) - 1);
+    // add space for NULL terminator
+    len++;
+
+    char **ret = malloc(sizeof(char *) * len);
+    char *tok = strtok(str, &delim);
+    int i = 0;
+
+    // char str_delim[2] = { delim, 0 };
+
+    while (tok) {
+        ret[i] = strdup(tok);
+        tok = strtok(NULL, &delim);
+        i++;
+    }
+    ret[i] = NULL;
+
+    return ret;
+}
+
+static void
+free_strs(char **strs)
+{
+    for (int i = 0; strs[i]; i++) {
+        free(strs[i]);
+    }
+    free(strs);
+}
+
+static int
+has_str(char **strs, const char *str)
+{
+    for (int i = 0; strs[i]; i++) {
+        if (streq(strs[i], str))
+            return 1;
+    }
+    return 0;
+}
+
 static void
 print_pair(const char *fmt, struct pair *p, int keys, int sep)
 {
@@ -159,9 +214,15 @@ print_pair(const char *fmt, struct pair *p, int keys, int sep)
 
 static int
 print_pairs(const char *fmt, struct section *s, struct section *d, int keys,
-        int sep, int dry_run)
+        int sep, char **filter, int dry_run)
 {
-    int i = 0;
+    int di = 0;
+    int si = 0;
+
+    for (struct pair *p = s->pairs; p; p = p->next) {
+        if (!filter || has_str(filter, p->key))
+            si++;
+    }
 
     if (d) {
         // print keys inherited from DEFAULT if key is not redefined in section
@@ -170,24 +231,30 @@ print_pairs(const char *fmt, struct section *s, struct section *d, int keys,
                 if (streq(dp->key, sp->key))
                     goto outer;
             }
+            if (filter && !has_str(filter, dp->key))
+                continue;
             if (!dry_run) {
-                if (i > 0)
+                if (di > 0)
                     printf("%c", sep);
                 print_pair(fmt, dp, keys, -1);
             }
-            i++;
+            di++;
         outer: continue;
         }
 
-        if (!dry_run && i > 0 && s->pairs)
+        if (!dry_run && di > 0 && si > 0)
             printf("%c", sep);
     }
 
-    for (struct pair *p = s->pairs; p; p = p->next, i++)
+    int i = 0;
+    for (struct pair *p = s->pairs; p; p = p->next) {
+        if (filter && !has_str(filter, p->key))
+            continue;
         if (!dry_run)
-            print_pair(fmt, p, keys, p->next ? sep : -1);
+            print_pair(fmt, p, keys, ++i < si ? sep : -1);
+    }
 
-    return i;
+    return di + si;
 }
 
 static int
@@ -226,21 +293,31 @@ print_value(const char *fmt, struct section *s, const char *key)
 }
 
 static int
-print_output(const char *fmt, struct section *d)
+print_output(const char *fmt, char *filter, struct section *d)
 {
+    char **keys = NULL;
+    if (filter)
+        keys = split_str(filter, ',');
+
     int i = 0;
 
     for (struct section *s = sections; s; s = s->next, i++) {
         if (!include_default && streq(s->name, DEFAULT_SECTION))
             continue;
+        // dry run to count keys
+        int n = print_pairs(fmt, s, d, 0, -1, keys, 1);
+        if (filter && n == 0)
+            continue;
         struct pair p = {"section", s->name, NULL};
         print_pair(fmt, &p, 0, -1);
-        // dry run to count keys
-        if (print_pairs(fmt, s, d, 0, -1, 1))
+        if (n > 0)
             printf("%c", ' ');
-        print_pairs(fmt, s, d, 0, ' ', 0);
+        print_pairs(fmt, s, d, 0, ' ', keys, 0);
         printf("\n");
     }
+
+    if (keys)
+        free_strs(keys);
 
     return i;
 }
@@ -337,6 +414,8 @@ print_usage(int code)
           "  -f FORMAT   Print output according to FORMAT\n"
           "                where %s = section, %k = key, %v = value\n"
           "  -o          Output sections, keys, and values\n"
+          "  -O FILTER   Output according to FILTER\n"
+          "                where FILTER is a comma-separated list of keys\n"
           "  -v          Show version\n",
           code ? stderr : stdout);
 
@@ -362,11 +441,12 @@ main(int argc, char *argv[])
     };
     const char *path = NULL;
     const char *fmt = NULL;
+    char *filter = NULL;
     unsigned int section_index = 0;
     unsigned int output = 0;
     int opt;
 
-    while ((opt = getopt(argc, argv, "hqdDs:mcP:p:ni:f:ov")) != -1) {
+    while ((opt = getopt(argc, argv, "hqdDs:mcP:p:ni:f:oO:v")) != -1) {
         switch (opt) {
         case 'h': print_usage(EXIT_SUCCESS); break;
         case 'q': quiet = 1; break;
@@ -381,6 +461,7 @@ main(int argc, char *argv[])
         case 'i': section_index = strtoui(optarg); break;
         case 'f': fmt = optarg; break;
         case 'o': output = 1; break;
+        case 'O': output = 1; filter = optarg; break;
         case 'v': printf("%s\n", VERSION); exit(EXIT_SUCCESS);
         }
     }
@@ -462,7 +543,7 @@ main(int argc, char *argv[])
         d = get_section(DEFAULT_SECTION, 0);
 
     if (output)
-        exit(print_output(fmt, d) > 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+        exit(print_output(fmt, filter, d) > 0 ? EXIT_SUCCESS : EXIT_FAILURE);
 
     if (key) {
         if (!print_value(fmt, s, key)) {
@@ -475,7 +556,7 @@ main(int argc, char *argv[])
             }
         }
     } else if (section) {
-        print_pairs(fmt, s, d, keys, '\n', 0);
+        print_pairs(fmt, s, d, keys, '\n', NULL, 0);
         printf("\n");
     } else if (!print_sections(fmt)) {
         die("%s: no sections\n", file);

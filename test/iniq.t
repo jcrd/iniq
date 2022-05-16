@@ -129,6 +129,15 @@ test_expect_success 'Output all (keyless, disable DEFAULT)' '
 test "$(iniq -o -D keyless.conf)" = "section=keyless"
 '
 
+test_expect_success 'Output filtered' '
+test "$(iniq -O keyA test.conf)" = "section=section1 keyA=a"
+'
+
+test_expect_success 'Output filtered (with DEFAULT)' '
+test "$(iniq -O default,keyB test.conf)" = "section= default=true
+section=section1 default=true keyB=b"
+'
+
 test_done
 
 # vim: ft=sh

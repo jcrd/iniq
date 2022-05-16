@@ -87,6 +87,13 @@ Output will have the following format, with one section per line:
  section=name1 key=value
  section=name2 key=value
 
+=item B<-O> I<FILTER>
+
+Output sections, keys, and values according to I<FORMAT> if specified.
+In this case, only %k and %v are used.
+Only keys specified in the comma-separated list I<FILTER> are printed.
+Only sections with at least one key are printed.
+
 =item B<-v>
 
 Show version.
@@ -178,6 +185,12 @@ B<iniq> -f %k:%v -o F<example.conf>
  section: in_section:false
  section:section1 default:true key1:value1
  section:example.com default:true key2:value2
+
+=item Output sections, keys, and values according to a filter:
+
+B<iniq> -O in_section,key1 F<example.conf>
+ section= in_section=false
+ section=section1 key1=value1
 
 =back
 
