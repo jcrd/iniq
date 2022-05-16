@@ -1,11 +1,11 @@
 Name: iniq
-Version: 0.3.0
+Version: 0.4.0
 Release: 1%{?dist}
 Summary: A simple INI file reader for the command line
 
 License: BSD-3-Clause
 URL: https://github.com/jcrd/iniq
-Source0: https://github.com/jcrd/iniq/archive/v0.3.0.tar.gz
+Source0: https://github.com/jcrd/iniq/archive/v0.4.0.tar.gz
 
 BuildRequires: gcc
 BuildRequires: perl
@@ -34,5 +34,8 @@ make test
 /usr/share/man/man1/%{name}.1.gz
 
 %changelog
+* Mon May 16 2022 James Reed <james@twiddlingbits.net> - 0.4.0-1
+- Release v0.4.0
+
 * Mon May 11 2020 James Reed <jcrd@tuta.io> - 0.3.0
 - Initial package
